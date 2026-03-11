@@ -1,0 +1,25 @@
+{
+    "name": "room-catering/system",
+    "description": "Room and Catering Management System with OOP Principles",
+    "type": "project",
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "App\\Core\\": "app/core/",
+            "App\\Controllers\\": "app/controllers/",
+            "App\\Models\\": "app/models/",
+            "App\\Interfaces\\": "app/interfaces/",
+            "App\\Services\\": "app/services/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Developer",
+            "email": "dev@roomcatering.com"
+        }
+    ]
+}
