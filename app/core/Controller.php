@@ -54,7 +54,8 @@ class Controller {
      * @return void
      */
     protected function redirect($url) {
-        header('Location: ' . BASEURL . '/' . $url);
+        $target = ltrim($url, '/');
+        header('Location: ' . BASEURL . '/' . $target);
         exit();
     }
     

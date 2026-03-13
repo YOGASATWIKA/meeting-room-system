@@ -1,7 +1,15 @@
 <?php
 /**
  * Main Entry Point
- * Redirects to public directory
+ * Boots application directly
  */
-header('Location: public/');
-exit();
+
+// Start session
+session_start();
+
+// Load app initialization
+require_once __DIR__ . '/app/init.php';
+
+// Create and run app
+use App\Core\App;
+$app = new App();

@@ -10,6 +10,39 @@ function get_env($key, $default = null) {
     return $_ENV[$key] ?? getenv($key) ?? $default;
 }
 
+// Deteksi HTTPS yang kompatibel dengan reverse proxy (Railway, Nginx, dll)
+function request_is_https() {
+    if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+        return true;
+    }
+
+    if (!empty($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443) {
+        return true;
+    }
+
+    if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+        $proto = strtolower(trim(explode(',', $_SERVER['HTTP_X_FORWARDED_PROTO'])[0]));
+        return $proto === 'https';
+    }
+
+    return false;
+}
+
+// Bangun base URL otomatis dari request aktif jika APP_URL tidak diset
+function detect_base_url() {
+    $scheme = request_is_https() ? 'https' : 'http';
+
+    $host = $_SERVER['HTTP_X_FORWARDED_HOST']
+        ?? $_SERVER['HTTP_HOST']
+        ?? 'localhost';
+    $host = trim(explode(',', $host)[0]);
+
+    $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/'));
+    $basePath = $scriptDir === '/' ? '' : rtrim($scriptDir, '/');
+
+    return $scheme . '://' . $host . $basePath;
+}
+
 // --- LOGIKA DATABASE ---
 $dbUrl = get_env('MYSQL_URL'); // Mengambil dari Railway Reference
 
@@ -33,7 +66,9 @@ if ($dbUrl) {
 // --- KONFIGURASI LAINNYA ---
 
 // Base URL Configuration
-define('BASEURL', get_env('APP_URL', 'http://localhost/meeting-room-system/public'));
+$configuredAppUrl = get_env('APP_URL');
+$baseUrl = $configuredAppUrl ?: detect_base_url();
+define('BASEURL', rtrim($baseUrl, '/'));
 
 // Upload Directory Configuration
 $defaultUpload = $_SERVER['DOCUMENT_ROOT'] . '/meeting-room-system/public/uploads/';
