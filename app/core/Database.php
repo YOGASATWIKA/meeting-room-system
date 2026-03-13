@@ -19,10 +19,23 @@ class Database {
     /**
      * Constructor - Private untuk implement Singleton Pattern
      * Melakukan koneksi ke database dengan PDO
+     * Mendukung MYSQL_URL (Railway/platform deploy) maupun variabel individual
      */
     private function __construct() {
-        $dsn = 'mysql:host=' . $this->host . ';dbname=' . $this->dbName;
-        
+        // Jika MYSQL_URL tersedia, parse URL untuk mendapatkan kredensial
+        $mysqlUrl = $_ENV['MYSQL_URL'] ?? '';
+        if (!empty($mysqlUrl)) {
+            $parsed = parse_url($mysqlUrl);
+            $this->host   = $parsed['host'] ?? $this->host;
+            $this->user   = $parsed['user'] ?? $this->user;
+            $this->pass   = $parsed['pass'] ?? $this->pass;
+            $this->dbName = ltrim($parsed['path'] ?? ('/' . $this->dbName), '/');
+            $port         = isset($parsed['port']) ? ';port=' . $parsed['port'] : '';
+            $dsn = 'mysql:host=' . $this->host . $port . ';dbname=' . $this->dbName;
+        } else {
+            $dsn = 'mysql:host=' . $this->host . ';dbname=' . $this->dbName;
+        }
+
         $options = [
             \PDO::ATTR_PERSISTENT => true,
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
