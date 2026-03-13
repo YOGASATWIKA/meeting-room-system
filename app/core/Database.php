@@ -12,6 +12,7 @@ class Database {
     private $user = DB_USER;
     private $pass = DB_PASS;
     private $dbName = DB_NAME;
+    private $port = DB_PORT;
     
     private $dbh; // Database handler
     private $stmt; // Statement
@@ -33,7 +34,8 @@ class Database {
             $port         = isset($parsed['port']) ? ';port=' . $parsed['port'] : '';
             $dsn = 'mysql:host=' . $this->host . $port . ';dbname=' . $this->dbName;
         } else {
-            $dsn = 'mysql:host=' . $this->host . ';dbname=' . $this->dbName;
+            $port = !empty($this->port) ? ';port=' . $this->port : '';
+            $dsn = 'mysql:host=' . $this->host . $port . ';dbname=' . $this->dbName;
         }
 
         $options = [
