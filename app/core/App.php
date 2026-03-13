@@ -52,19 +52,30 @@ class App {
         call_user_func_array([$this->controller, $this->method], $this->params);
     }
     
-    /**
-     * Parse URL from Request
-     * Method untuk mem-parse URL dari request
-     * 
-     * @return array|null Parsed URL segments
-     */
     protected function parseURL() {
-        if (isset($_GET['url'])) {
-            $url = rtrim($_GET['url'], '/');
-            $url = filter_var($url, FILTER_SANITIZE_URL);
-            $url = explode('/', $url);
-            return $url;
+        // 1. Ambil PATH dari URL (Misal: /auth/register)
+        // parse_url digunakan untuk membuang query string seperti ?id=1
+        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+        // 2. Bersihkan Base Path (Penting jika di lokal pakai folder, di prod tidak)
+        // Ini akan menghapus "/meeting-room-system" dari path jika ada
+        $scriptName = dirname($_SERVER['SCRIPT_NAME']);
+        
+        // Jika scriptName bukan root, kita hapus dari URI
+        if ($scriptName !== '/' && $scriptName !== '\\') {
+            $uri = str_replace($scriptName, '', $uri);
         }
-        return null;
+
+        // 3. Bersihkan sisa slash dan filter karakter aneh
+        $url = trim($uri, '/');
+
+        // 4. Jika setelah dibersihkan URL kosong, return null (biar default Home jalan)
+        if ($url === "") {
+            return null;
+        }
+
+        // 5. Ubah string menjadi array (Misal: "auth/register" jadi ["auth", "register"])
+        $url = filter_var($url, FILTER_SANITIZE_URL);
+        return explode('/', $url);
     }
 }
