@@ -17,13 +17,20 @@ Project ini adalah implementasi sistem manajemen yang menggabungkan:
 - 🔐 Login & Register dengan validasi
 - 📦 Browse katalog produk catering dengan search & filter
 - 🛒 Shopping cart untuk pemesanan
-- 📝 Manajemen order pribadi
+- 📝 Manajemen order pribadi (Create, Edit, Delete)
+- ✏️ Edit/Update order yang masih pending
+- 🗑️ Delete order dengan stock restoration otomatis
 - 🏢 Browse dan booking ruangan meeting
+- 📅 Edit/Update booking yang masih pending
+- ❌ Delete booking dengan validasi
 - 👤 Update profile
-
-### Untuk Admin:
-- 📊 Dashboard dengan statistik
-- ➕ CRUD Produk (Create, Read, Update, Delete)
+- 🔔 CRUD Manajemen semua orders
+- 📅 CRUD Manajemen semua bookings
+- ✅ Update status order dan booking
+- 🏢 CRUD Manajemen ruangan lengkap
+- 👥 Manajemen users
+- 📈 Reports dan analytics
+- 🔄 Transaction management untuk data consistencyead, Update, Delete)
 - 📋 Manajemen semua orders
 - ✅ Update status order
 - 🏢 Manajemen ruangan
@@ -32,18 +39,22 @@ Project ini adalah implementasi sistem manajemen yang menggabungkan:
 
 ## 🎯 Kriteria yang Dipenuhi
 
-Project ini memenuhi **SEMUA** kriteria penilaian:
-
-✅ **a. DFD/Use Case Diagram** - Lengkap dengan dokumentasi  
+Project ini memenuhi **SEMUA** kriteria penilaian:& Mermaid diagrams  
 ✅ **b. Coding Guidelines** - PSR-1, PSR-2, PSR-4 standards  
 ✅ **c. Interface Input/Output** - Form lengkap dengan tampilan user-friendly  
 ✅ **d. Tipe Data & Control Structures** - if-else, switch, loops, semua tipe data  
-✅ **e. Methods/Functions** - 100+ methods dengan berbagai fungsi  
-✅ **f. Array Usage** - Extensive usage di seluruh aplikasi  
-✅ **g. Data Storage** - MySQL database dengan CRUD lengkap  
+✅ **e. Methods/Functions** - 120+ methods dengan berbagai fungsi  
+✅ **f. Array Usage** - 60+ instances di seluruh aplikasi  
+✅ **g. Data Storage** - MySQL database dengan CRUD lengkap + transaction support  
 ✅ **h. OOP Concepts** - Inheritance, Polymorphism, Interface, Access Modifiers  
 ✅ **i. Namespace/Package** - 5+ namespaces dengan PSR-4  
-✅ **j. External Library** - Composer, PDO, Filter, Password, FileInfo  
+✅ **j. External Library** - Composer, PDO, Filter, Password, FileInfo, Session  
+✅ **k. Database** - MySQL dengan 6 tables dan relasi yang proper  
+✅ **l. Documentation** - PHPDoc standard dengan inline comments  
+
+**Dokumentasi Lengkap:**
+- 📄 [JAWABAN_KRITERIA.md](docs/JAWABAN_KRITERIA.md) - Jawaban detail semua kriteria
+- 📊 [DIAGRAMS.md](docs/DIAGRAMS.md) - Mermaid diagrams lengkap (ERD, Use Case, DFD, Class Diagram, dll)leInfo  
 ✅ **k. Database** - MySQL dengan 6 tables dan relasi yang proper  
 ✅ **l. Documentation** - PHPDoc standard dengan inline comments  
 
@@ -94,12 +105,18 @@ meeting-room-system/
 ├── database/
 │   └── schema.sql          # Database schema & sample data
 ├── docs/
-│   └── JAWABAN_KRITERIA.md # Dokumentasi lengkap kriteria a-l
+│   ├── DIAGRAMS.md         # Mermaid diagrams (ERD, DFD, Class, Sequence, dll)
+│   ├── INSTALLATION.md     # Panduan instalasi detail
+│   ├── JAWABAN_KRITERIA.md # Dokumentasi lengkap kriteria a-l
+│   └── PROJECT_SUMMARY.md  # Ringkasan project
 ├── public/                 # Public directory (Document Root)
 │   ├── index.php          # Entry point
 │   ├── .htaccess          # URL rewriting
 │   └── uploads/           # User uploads
-│       └── products/      # Product images
+│       ├── products/      # Product images
+│       └── rooms/         # Room images
+├── vendor/                # Composer dependencies (auto-generated)
+│   └── autoload.php       # PSR-4 autoloader
 ├── composer.json          # Composer dependencies
 └── README.md             # This file
 ```
@@ -302,7 +319,48 @@ Untuk production deployment:
    - Use production database
    - Enable gzip compression
 
-## 📝 License
+## � Diagrams & Documentation
+
+Project ini dilengkapi dengan dokumentasi visual lengkap menggunakan Mermaid diagram:
+
+### Lihat [DIAGRAMS.md](docs/DIAGRAMS.md) untuk:
+
+1. **Entity Relationship Diagram (ERD)** - Struktur database dan relasi antar tabel
+2. **Use Case Diagram** - Interaksi user dengan sistem
+3. **Data Flow Diagram (DFD)**
+   - Level 0 (Context Diagram)
+   - Level 1 (Process Detail)
+4. **Class Diagram**
+   - Core Components (Model, BaseModel, dll)
+   - Controllers Architecture
+5. **Sequence Diagram**
+   - Order Processing Flow
+   - Booking Edit Flow
+6. **State Diagram**
+   - Order Status Lifecycle
+   - Booking Status Lifecycle
+7. **System Architecture Diagram** - Layered architecture overview
+8. **Component Diagram** - Component dependencies
+
+### Dokumentasi Detail:
+
+- 📄 **[JAWABAN_KRITERIA.md](docs/JAWABAN_KRITERIA.md)** - Penjelasan lengkap implementasi kriteria a-l
+- 📊 **[DIAGRAMS.md](docs/DIAGRAMS.md)** - Visualisasi sistem dengan Mermaid
+- 📦 **[PROJECT_SUMMARY.md](docs/PROJECT_SUMMARY.md)** - Ringkasan project
+- 🔧 **[INSTALLATION.md](docs/INSTALLATION.md)** - Panduan instalasi detail
+
+## 🔄 Recent Updates
+
+**Version 2.0 - Full CRUD Implementation:**
+- ✅ Added Edit/Update functionality for Bookings
+- ✅ Added Edit/Update functionality for Orders with dynamic item management
+- ✅ Added Delete functionality with proper transaction handling
+- ✅ Automatic stock restoration on order deletion
+- ✅ Smart room availability check (excludes current booking when editing)
+- ✅ Enhanced validation and error handling
+- ✅ Complete Mermaid diagrams for all system aspects
+
+## �📝 License
 
 This project is created for educational purposes.
 

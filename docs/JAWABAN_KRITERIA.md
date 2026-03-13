@@ -11,6 +11,8 @@
 
 Program telah dirancang berdasarkan DFD dan Use Case yang jelas.
 
+> **Note**: Untuk visualisasi lengkap dengan Mermaid diagrams, lihat [DIAGRAMS.md](./DIAGRAMS.md)
+
 ### Data Flow Diagram (DFD) Level 0 (Context Diagram):
 
 ```
@@ -100,9 +102,14 @@ Room Data      ────────▶│  5.0 Room Management    │──�
 │       │                                                             │
 │       ├──────────── (Add Product to Cart)                          │
 │       ├──────────── (Place Order)                                  │
+│       ├──────────── (Edit Order) - NEW                             │
+│       ├──────────── (Delete Order) - NEW                           │
 │       ├──────────── (View My Orders)                               │
 │       ├──────────── (Book Room)                                    │
+│       ├──────────── (Edit Booking) - NEW                           │
+│       ├──────────── (Delete Booking) - NEW                         │
 │       ├──────────── (View My Bookings)                             │
+│       ├──────────── (Cancel Order/Booking)                         │
 │       └──────────── (Update Profile)                               │
 │                                                                     │
 │  ┌──────────┐                                                       │
@@ -110,9 +117,11 @@ Room Data      ────────▶│  5.0 Room Management    │──�
 │  └────┬─────┘                                                       │
 │       │                                                             │
 │       ├──────────── (Manage Products) <<CRUD>>                     │
-│       ├──────────── (Manage Orders)                                │
+│       ├──────────── (Manage Orders) <<CRUD>> - UPDATED             │
 │       ├──────────── (Update Order Status)                          │
 │       ├──────────── (Manage Rooms) <<CRUD>>                        │
+│       ├──────────── (Manage Bookings) <<CRUD>> - UPDATED           │
+│       ├──────────── (Update Booking Status)                        │
 │       ├──────────── (View Reports)                                 │
 │       ├──────────── (Manage Users)                                 │
 │       └──────────── (View Statistics)                              │
@@ -524,9 +533,9 @@ Program extensively menggunakan methods dan functions dengan berbagai tujuan:
 #### AuthController (app/controllers/Auth.php):
 ```php
 class Auth extends Controller {
-    public function login() { } // Tampilkan form login
-    public function processLogin() { } // Proses login
-    public function register() { } // Tampilkan form register
+    public function login() { }
+    public function processLogin() { }
+    public function register() { } 
     public function processRegister() { } // Proses registrasi
     public function logout() { } // Logout user
 }
@@ -542,6 +551,38 @@ class Products extends Controller {
     public function edit($id) { } // Form edit
     public function update($id) { } // Update product
     public function delete($id) { } // Delete product
+}
+```
+
+#### BookingsController (app/controllers/Bookings.php):
+```php
+class Bookings extends Controller {
+    public function index() { } // List bookings
+    public function show($id) { } // Detail booking
+    public function create() { } // Form create booking
+    public function store() { } // Save booking
+    public function edit($id) { } // Form edit booking - NEW
+    public function update($id) { } // Update booking - NEW
+    public function delete($id) { } // Delete booking - NEW
+    public function cancel($id) { } // Cancel booking
+    public function updateStatus($id) { } // Update status (Admin)
+}
+```
+
+#### OrdersController (app/controllers/Orders.php):
+```php
+class Orders extends Controller {
+    public function index() { } // List orders
+    public function show($id) { } // Detail order
+    public function create() { } // Shopping cart
+    public function store() { } // Process order
+    public function edit($id) { } // Form edit order - NEW
+    public function update($id) { } // Update order - NEW
+    public function delete($id) { } // Delete order - NEW
+    public function addToCart($productId) { } // Add to cart
+    public function removeFromCart($productId) { } // Remove from cart
+    public function cancel($id) { } // Cancel order
+    public function updateStatus($id) { } // Update status (Admin)
 }
 ```
 
@@ -568,6 +609,30 @@ class Product extends BaseModel {
     public function updateStock($productId, $quantity, $operation = 'subtract') { }
     public function getPopularProducts($limit = 5) { }
     public function getLowStockProducts($threshold = 10) { }
+}
+```
+
+#### Room Model (app/models/Room.php):
+```php
+class Room extends BaseModel {
+    public function getActiveRooms() { }
+    public function getAvailableRooms($date, $startTime, $endTime) { }
+    public function isAvailable($roomId, $date, $startTime, $endTime) { }
+    public function isAvailableExcept($roomId, $date, $startTime, $endTime, $excludeId) { } // NEW
+    public function getBookingHistory($roomId, $limit = 10) { }
+}
+```
+
+#### Order Model (app/models/Order.php):
+```php
+class Order extends BaseModel {
+    public function createWithItems(array $orderData, array $items) { }
+    public function updateWithItems($id, array $orderData, array $items) { } // NEW
+    public function deleteOrder($id) { } // NEW
+    public function getOrderWithItems($orderId) { }
+    public function getOrdersByUser($userId, $status = null) { }
+    public function updateStatus($orderId, $newStatus) { }
+    public function getStatistics($startDate = null, $endDate = null) { }
 }
 ```
 
@@ -661,7 +726,26 @@ public function getCurrentUser(): ?array { }
 public function create(array $data): int { }
 ```
 
-**Total Methods**: 100+ methods across the application demonstrating various programming patterns and best practices.
+**Total Methods**: 120+ methods across the application demonstrating various programming patterns and best practices.
+
+#### NEW Methods Added for Full CRUD:
+
+**Bookings Controller:**
+- `edit($id)` - Display edit form for pending bookings
+- `update($id)` - Process booking updates with validation
+- `delete($id)` - Delete pending bookings
+
+**Orders Controller:**
+- `edit($id)` - Display edit form for pending orders
+- `update($id)` - Update order with dynamic items management
+- `delete($id)` - Delete pending orders and restore stock
+
+**Room Model:**
+- `isAvailableExcept()` - Check room availability excluding specific booking (for edit)
+
+**Order Model:**
+- `updateWithItems()` - Update order and items with transaction support
+- `deleteOrder()` - Delete order, items, and restore product stock
 
 ---
 
@@ -868,7 +952,46 @@ $order = [
 - `empty()` - Check if array is empty
 - `unset()` - Remove array element
 
-**Total Array Usage**: 50+ instances across the application.
+**Total Array Usage**: 60+ instances across the application.
+
+### 9. **Dynamic Array Manipulation in Order Edit**:
+
+Contoh advanced array processing dalam edit order dengan JavaScript:
+
+```php
+// Controller: Get order with items (multidimensional array)
+$order = $this->orderModel->getOrderWithItems($id);
+// Result: [
+//   'id' => 1,
+//   'order_number' => 'ORD-001',
+//   'items' => [
+//     ['product_id' => 1, 'quantity' => 5, 'price' => 25000],
+//     ['product_id' => 2, 'quantity' => 3, 'price' => 15000]
+//   ]
+// ]
+
+// Processing items update
+$productIds = $_POST['product_id'] ?? [];
+$quantities = $_POST['quantity'] ?? [];
+
+if (!empty($productIds) && is_array($productIds)) {
+    foreach ($productIds as $index => $productId) {
+        $quantity = intval($quantities[$index] ?? 0);
+        
+        if ($productId && $quantity > 0) {
+            $product = Product::find($productId);
+            
+            if ($product && $product['stock'] >= $quantity) {
+                $orderItems[] = [
+                    'product_id' => $productId,
+                    'quantity' => $quantity,
+                    'price' => $product['price']
+                ];
+            }
+        }
+    }
+}
+```
 
 ---
 
@@ -1015,6 +1138,18 @@ $productModel->updateRecord(1, [
     'name' => 'Nasi Box Special',
     'price' => 30000
 ]);
+
+// Update booking
+$bookingModel->updateRecord($id, [
+    'room_id' => $roomId,
+    'booking_date' => $bookingDate,
+    'start_time' => $startTime,
+    'end_time' => $endTime,
+    'total_price' => $totalPrice
+]);
+
+// Update order with items (complex transaction)
+$orderModel->updateWithItems($orderId, $orderData, $orderItems);
 ```
 
 ### 5. **DELETE - Menghapus Data**:
@@ -1032,6 +1167,12 @@ public static function delete($id) {
 ```php
 // Delete product
 Product::delete(1);
+
+// Delete booking
+$bookingModel->deleteRecord($bookingId);
+
+// Delete order with stock restoration
+$orderModel->deleteOrder($orderId); // Restores product stock automatically
 ```
 
 ### 6. **Advanced Data Operations**:
@@ -1139,6 +1280,37 @@ Tables created:
 
 **Total**: 6 tables dengan relasi yang proper (Foreign Keys, Indexes)
 
+### 11. **Advanced Database Operations - Room Availability Check**:
+
+#### Check Availability (Excluding Current Booking - for Edit):
+```php
+// In Room Model - NEW METHOD
+public function isAvailableExcept($roomId, $date, $startTime, $endTime, $excludeBookingId) {
+    $sql = "SELECT COUNT(*) as count FROM bookings 
+            WHERE room_id = :room_id 
+            AND booking_date = :date 
+            AND status != 'cancelled'
+            AND id != :exclude_id
+            AND (
+                (:start_time >= start_time AND :start_time < end_time)
+                OR (:end_time > start_time AND :end_time <= end_time)
+                OR (:start_time <= start_time AND :end_time >= end_time)
+            )";
+    
+    $this->db->query($sql);
+    $this->db->bind(':room_id', $roomId);
+    $this->db->bind(':date', $date);
+    $this->db->bind(':start_time', $startTime);
+    $this->db->bind(':end_time', $endTime);
+    $this->db->bind(':exclude_id', $excludeBookingId);
+    
+    $result = $this->db->single();
+    return $result['count'] == 0;
+}
+```
+
+This allows users to edit their booking without conflicting with themselves.
+
 ### 10. **Data Persistence Features**:
 - ✅ Session storage (shopping cart, user login)
 - ✅ Database storage (permanent data)
@@ -1175,13 +1347,13 @@ class Database {
 
 ```php
 class BaseModel extends Model {
-    protected static $table = '';        // Protected: bisa diakses child
-    protected static $primaryKey = 'id'; // Protected static
-    protected $fillable = [];           // Protected property
-    protected $rules = [];              // Protected property
+    protected static $table = ''; 
+    protected static $primaryKey = 'id';
+    protected $fillable = [];
+    protected $rules = [];
     
-    public function create(array $data) { } // Public method
-    protected function filterFillable() { } // Protected helper
+    public function create(array $data) { }
+    protected function filterFillable() { }
 }
 ```
 
@@ -1273,10 +1445,9 @@ public function create(array $data) {
     return $this->insert($filteredData);
 }
 
-// Overridden in User model
+
 class User extends BaseModel {
     public function create(array $data) {
-        // Custom logic: hash password
         if (isset($data['password'])) {
             $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
         }
@@ -1284,8 +1455,6 @@ class User extends BaseModel {
         if (!isset($data['role'])) {
             $data['role'] = 'user';
         }
-        
-        // Call parent method
         return parent::create($data);
     }
 }
@@ -1320,13 +1489,12 @@ class Product extends BaseModel {
 PHP tidak support true method overloading, tapi kita menggunakan default parameters:
 
 ```php
-// Overloading dengan default parameters
+
 public function search($keyword, array $fields = []) { }
 
-// Bisa dipanggil dengan berbagai cara:
-$model->search('keyword');                    // fields = []
-$model->search('keyword', ['name']);          // fields = ['name']
-$model->search('keyword', ['name', 'desc']);  // fields = ['name', 'desc']
+$model->search('keyword');
+$model->search('keyword', ['name']);
+$model->search('keyword', ['name', 'desc']);
 ```
 
 ```php
@@ -1424,9 +1592,8 @@ abstract class BaseModel extends Model {
 
 ```php
 class ValidationService {
-    private $errors = [];  // Private: hanya bisa diakses dalam class
-    
-    // Public method untuk akses controlled
+    private $errors = []; 
+
     public function getErrors() {
         return $this->errors;
     }
@@ -1435,7 +1602,6 @@ class ValidationService {
         $this->errors = [];
     }
     
-    // Private/protected methods untuk internal use
     private function addError($field, $message) {
         $this->errors[$field][] = $message;
     }
@@ -1822,6 +1988,7 @@ $db = \App\Core\Database::getInstance();
 - App\Services
 
 **Total Classes**: 17+ classes across namespaces
+**Total Views**: 25+ view files (including new edit.php for bookings and orders)
 
 ---
 
@@ -2890,7 +3057,26 @@ Program **Room & Catering Management System** telah berhasil memenuhi **SEMUA** 
 - **Security**: PDO Prepared Statements, Password Hashing, Input Sanitization
 - **Architecture**: Clean separation of concerns, Service Layer, Repository Pattern
 
-### Total Lines of Code: 3000+ baris
-### Total Files: 30+ files
+### Total Lines of Code: 3500+ baris
+### Total Files: 35+ files (including new edit views)
 ### Total Classes: 17+ classes
-### Total Methods: 100+ methods
+### Total Methods: 120+ methods
+
+### New Features Added:
+1. **Full CRUD for Bookings** - Create, Read, Update, Delete
+2. **Full CRUD for Orders** - Create, Read, Update, Delete with stock management
+3. **Dynamic Order Item Management** - Add/remove items when editing
+4. **Smart Room Availability Check** - Excludes current booking when editing
+5. **Transaction Support for Updates** - Ensures data consistency
+6. **Stock Restoration on Delete** - Automatically restores product stock
+
+### Additional Diagrams:
+See [DIAGRAMS.md](./DIAGRAMS.md) for complete Mermaid diagrams:
+- Entity Relationship Diagram (ERD)
+- Use Case Diagram
+- Data Flow Diagrams (Level 0 & 1)
+- Class Diagrams (Models & Controllers)
+- Sequence Diagrams (Order Processing & Booking Edit)
+- State Diagrams (Order & Booking Status)
+- System Architecture Diagram
+- Component Diagram

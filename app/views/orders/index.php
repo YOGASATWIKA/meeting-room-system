@@ -41,6 +41,10 @@
                         </td>
                         <td>
                             <a href="<?= BASEURL ?>/orders/show/<?= $order['id'] ?>" class="btn">View</a>
+                            <?php if($order['status'] === 'pending'): ?>
+                                <a href="<?= BASEURL ?>/orders/edit/<?= $order['id'] ?>" class="btn" style="margin-left: 5px;">Edit</a>
+                                <a href="<?= BASEURL ?>/orders/delete/<?= $order['id'] ?>" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this order?')" style="margin-left: 5px;">Delete</a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>

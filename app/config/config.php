@@ -12,12 +12,12 @@ define('UPLOADPATH', $_SERVER['DOCUMENT_ROOT'] . '/meeting-room-system/public/up
 
 // Database Configuration
 define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_USER', 'meeting_user');
+define('DB_PASS', 'meeting_pass123');
 define('DB_NAME', 'room_catering_db');
 
 // Application Configuration
-define('APP_NAME', 'Room & Catering Management System');
+define('APP_NAME', 'Room Management System');
 define('APP_VERSION', '1.0.0');
 
 // Session Configuration

@@ -213,4 +213,125 @@ class Order extends BaseModel {
         
         return $this->db->single();
     }
+    
+    /**
+     * Update order with items
+     * Updates order data and replaces order items
+     * 
+     * @param int $orderId Order ID
+     * @param array $orderData Order data
+     * @param array $items New order items array
+     * @return bool Update status
+     */
+    public function updateWithItems($orderId, array $orderData, array $items) {
+        try {
+            // Begin transaction
+            $this->db->beginTransaction();
+            
+            // Get existing order items to restore stock
+            $existingItems = $this->getOrderItems($orderId);
+            $productModel = new Product();
+            
+            // Restore stock for existing items
+            foreach ($existingItems as $item) {
+                $productModel->updateStock($item['product_id'], $item['quantity'], 'add');
+            }
+            
+            // Calculate new total amount
+            $totalAmount = 0;
+            foreach ($items as $item) {
+                $totalAmount += $item['price'] * $item['quantity'];
+            }
+            $orderData['total_amount'] = $totalAmount;
+            
+            // Update order
+            $this->updateRecord($orderId, $orderData);
+            
+            // Delete existing order items
+            $this->db->query("DELETE FROM order_items WHERE order_id = :order_id");
+            $this->db->bind(':order_id', $orderId);
+            $this->db->execute();
+            
+            // Insert new order items
+            foreach ($items as $item) {
+                // Insert order item
+                $this->db->query("INSERT INTO order_items (order_id, product_id, quantity, price, subtotal) 
+                                VALUES (:order_id, :product_id, :quantity, :price, :subtotal)");
+                
+                $this->db->bind(':order_id', $orderId);
+                $this->db->bind(':product_id', $item['product_id']);
+                $this->db->bind(':quantity', $item['quantity']);
+                $this->db->bind(':price', $item['price']);
+                $this->db->bind(':subtotal', $item['price'] * $item['quantity']);
+                $this->db->execute();
+                
+                // Update product stock (subtract)
+                $productModel->updateStock($item['product_id'], $item['quantity'], 'subtract');
+            }
+            
+            // Commit transaction
+            $this->db->commit();
+            
+            return true;
+            
+        } catch (\Exception $e) {
+            // Rollback on error
+            $this->db->rollback();
+            return false;
+        }
+    }
+    
+    /**
+     * Get order items only
+     * 
+     * @param int $orderId Order ID
+     * @return array Order items
+     */
+    private function getOrderItems($orderId) {
+        $sql = "SELECT * FROM order_items WHERE order_id = :order_id";
+        $this->db->query($sql);
+        $this->db->bind(':order_id', $orderId);
+        return $this->db->resultSet();
+    }
+    
+    /**
+     * Delete order and its items
+     * Restores product stock
+     * 
+     * @param int $orderId Order ID
+     * @return bool Delete status
+     */
+    public function deleteOrder($orderId) {
+        try {
+            // Begin transaction
+            $this->db->beginTransaction();
+            
+            // Get order items to restore stock
+            $orderItems = $this->getOrderItems($orderId);
+            $productModel = new Product();
+            
+            // Restore stock for all items
+            foreach ($orderItems as $item) {
+                $productModel->updateStock($item['product_id'], $item['quantity'], 'add');
+            }
+            
+            // Delete order items
+            $this->db->query("DELETE FROM order_items WHERE order_id = :order_id");
+            $this->db->bind(':order_id', $orderId);
+            $this->db->execute();
+            
+            // Delete order
+            $this->deleteRecord($orderId);
+            
+            // Commit transaction
+            $this->db->commit();
+            
+            return true;
+            
+        } catch (\Exception $e) {
+            // Rollback on error
+            $this->db->rollback();
+            return false;
+        }
+    }
 }

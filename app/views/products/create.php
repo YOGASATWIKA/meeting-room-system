@@ -20,7 +20,8 @@
         
         <div class="form-group">
             <label for="price">Price (Rp) *</label>
-            <input type="number" id="price" name="price" required min="0" step="0.01" placeholder="0">
+            <input type="number" id="price" name="price" required min="0" max="99999999" step="100" placeholder="e.g., 25000">
+            <small>Range: Rp 0 - 99,999,999</small>
         </div>
         
         <div class="form-group">

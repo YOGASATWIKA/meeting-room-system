@@ -2,54 +2,50 @@
 
 <div class="card">
     <h2>Welcome to <?= APP_NAME ?></h2>
-    <p>Professional Room Booking and Catering Management System</p>
+    <p>Professional Meeting Room Booking System</p>
 </div>
 
 <div class="card">
-    <h3>Featured Products</h3>
+    <h3>Available Rooms</h3>
     <div class="grid">
-        <?php if(!empty($featured_products)): ?>
-            <?php foreach($featured_products as $product): ?>
-                <div class="product-card">
-                    <?php if($product['image']): ?>
-                        <img src="<?= BASEURL ?>/uploads/products/<?= $product['image'] ?>" alt="<?= $product['name'] ?>">
+        <?php if(!empty($rooms)): ?>
+            <?php foreach($rooms as $room): ?>
+                <div class="card">
+                    <?php if($room['image']): ?>
+                        <img src="<?= BASEURL ?>/uploads/rooms/<?= $room['image'] ?>" alt="<?= $room['name'] ?>" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px 8px 0 0;">
                     <?php else: ?>
-                        <img src="<?= BASEURL ?>/img/no-image.jpg" alt="No Image">
+                        <div style="width: 100%; height: 200px; background: #ecf0f1; display: flex; align-items: center; justify-content: center; border-radius: 8px 8px 0 0;">
+                            <span style="font-size: 48px;">🏢</span>
+                        </div>
                     <?php endif; ?>
                     
-                    <div class="content">
-                        <h3><?= htmlspecialchars($product['name']) ?></h3>
-                        <p><?= substr(htmlspecialchars($product['description'] ?? ''), 0, 100) ?>...</p>
-                        <div class="price">Rp <?= number_format($product['price'], 0, ',', '.') ?></div>
-                        <a href="<?= BASEURL ?>/products/show/<?= $product['id'] ?>" class="btn">View Details</a>
+                    <div style="padding: 15px;">
+                        <h3><?= htmlspecialchars($room['name']) ?></h3>
+                        <p><strong>Capacity:</strong> <?= $room['capacity'] ?> people</p>
+                        <p><strong>Price:</strong> Rp <?= number_format($room['price_per_hour'], 0, ',', '.') ?>/hour</p>
+                        
+                        <div style="margin-top: 10px;">
+                            <span class="badge badge-<?= $room['status'] === 'active' ? 'success' : 'warning' ?>">
+                                <?= strtoupper($room['status']) ?>
+                            </span>
+                        </div>
+                        
+                        <div style="margin-top: 15px;">
+                            <a href="<?= BASEURL ?>/rooms/show/<?= $room['id'] ?>" class="btn">View Details</a>
+                            <?php if($room['status'] === 'active'): ?>
+                                <a href="<?= BASEURL ?>/bookings/create?room_id=<?= $room['id'] ?>" class="btn" style="background: #27ae60;">Book Now</a>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
-            <p>No products available at the moment.</p>
+            <p>No rooms available at the moment.</p>
         <?php endif; ?>
     </div>
     
     <div style="text-align: center; margin-top: 20px;">
-        <a href="<?= BASEURL ?>/products/index" class="btn">View All Products</a>
-    </div>
-</div>
-
-<div class="card">
-    <h3>Our Services</h3>
-    <div class="grid">
-        <div class="card">
-            <h4>🍱 Catering Services</h4>
-            <p>Professional catering for all your events. From small meetings to large conferences.</p>
-        </div>
-        <div class="card">
-            <h4>🏢 Room Booking</h4>
-            <p>Book meeting rooms, conference halls, and training facilities with ease.</p>
-        </div>
-        <div class="card">
-            <h4>📊 Management Dashboard</h4>
-            <p>Track your orders, bookings, and manage your account from one place.</p>
-        </div>
+        <a href="<?= BASEURL ?>/rooms/index" class="btn">View All Rooms</a>
     </div>
 </div>
 

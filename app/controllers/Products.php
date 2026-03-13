@@ -126,10 +126,18 @@ class Products extends Controller {
         }
         
         // Prepare product data (array)
+        $price = floatval($_POST['price'] ?? 0);
+        
+        // Validate price range
+        if ($price < 0 || $price > 99999999.99) {
+            $this->flash('error', 'Price must be between 0 and 99,999,999');
+            $this->redirect('products/create');
+        }
+        
         $productData = [
             'name' => $this->validationService->sanitize($_POST['name'] ?? ''),
             'description' => $this->validationService->sanitize($_POST['description'] ?? ''),
-            'price' => floatval($_POST['price'] ?? 0),
+            'price' => $price,
             'category' => $this->validationService->sanitize($_POST['category'] ?? ''),
             'stock' => intval($_POST['stock'] ?? 0),
             'status' => $_POST['status'] ?? 'active'
@@ -213,10 +221,18 @@ class Products extends Controller {
         }
         
         // Prepare update data
+        $price = floatval($_POST['price'] ?? 0);
+        
+        // Validate price range
+        if ($price < 0 || $price > 99999999.99) {
+            $this->flash('error', 'Price must be between 0 and 99,999,999');
+            $this->redirect('products/edit/' . $id);
+        }
+        
         $productData = [
             'name' => $this->validationService->sanitize($_POST['name'] ?? ''),
             'description' => $this->validationService->sanitize($_POST['description'] ?? ''),
-            'price' => floatval($_POST['price'] ?? 0),
+            'price' => $price,
             'category' => $this->validationService->sanitize($_POST['category'] ?? ''),
             'stock' => intval($_POST['stock'] ?? 0),
             'status' => $_POST['status'] ?? 'active'

@@ -21,6 +21,7 @@ require_once 'models/User.php';
 require_once 'models/Product.php';
 require_once 'models/Room.php';
 require_once 'models/Order.php';
+require_once 'models/Booking.php';
 
 // Load services
 require_once 'services/AuthService.php';

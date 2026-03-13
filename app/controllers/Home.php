@@ -2,9 +2,8 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
-use App\Models\Product;
 use App\Models\Room;
-use App\Models\Order;
+use App\Models\Booking;
 use App\Services\AuthService;
 
 /**
@@ -30,14 +29,12 @@ class Home extends Controller {
      * @return void
      */
     public function index() {
-        $productModel = new Product();
         $roomModel = new Room();
         
         // Prepare data untuk view (demonstrasi array)
         $data = [
-            'title' => 'Welcome to Room & Catering System',
-            'featured_products' => $productModel->getPopularProducts(6),
-            'available_rooms' => array_slice(Room::all(), 0, 6),
+            'title' => 'Welcome to Room Management System',
+            'rooms' => array_slice(Room::all(), 0, 6),
             'user' => $this->authService->getCurrentUser()
         ];
         
@@ -55,8 +52,7 @@ class Home extends Controller {
         $this->requireLogin();
         
         $user = $this->authService->getCurrentUser();
-        $orderModel = new Order();
-        $productModel = new Product();
+        $bookingModel = new Booking();
         
         // Control structure: if-else untuk different dashboard by role
         if ($user['role'] === 'admin') {
@@ -64,9 +60,9 @@ class Home extends Controller {
             $data = [
                 'title' => 'Admin Dashboard',
                 'user' => $user,
-                'statistics' => $orderModel->getStatistics(),
-                'low_stock_products' => $productModel->getLowStockProducts(10),
-                'recent_orders' => array_slice(Order::all(), 0, 10)
+                'statistics' => $bookingModel->getStatistics(),
+                'upcoming_bookings' => $bookingModel->getUpcomingBookings(10),
+                'total_rooms' => Room::count()
             ];
             
             $this->view('home/admin_dashboard', $data);
@@ -75,8 +71,8 @@ class Home extends Controller {
             $data = [
                 'title' => 'My Dashboard',
                 'user' => $user,
-                'my_orders' => $orderModel->getOrdersByUser($user['id']),
-                'order_count' => count($orderModel->getOrdersByUser($user['id']))
+                'my_bookings' => $bookingModel->getBookingsByUser($user['id']),
+                'booking_count' => count($bookingModel->getBookingsByUser($user['id']))
             ];
             
             $this->view('home/user_dashboard', $data);
@@ -94,12 +90,11 @@ class Home extends Controller {
             'company_info' => [
                 'name' => APP_NAME,
                 'version' => APP_VERSION,
-                'description' => 'Professional Room and Catering Management System',
+                'description' => 'Professional Room Booking and Management System',
                 'features' => [
                     'Room Booking Management',
-                    'Catering Order System',
                     'User Management',
-                    'Inventory Tracking',
+                    'Booking Tracking',
                     'Reports and Analytics'
                 ]
             ]

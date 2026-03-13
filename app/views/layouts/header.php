@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?? 'Room & Catering System' ?></title>
+    <title><?= $title ?? 'Room Management System' ?></title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; }
@@ -49,11 +49,10 @@
     <nav>
         <ul>
             <li><a href="<?= BASEURL ?>/home/index">Home</a></li>
-            <li><a href="<?= BASEURL ?>/products/index">Products</a></li>
+            <li><a href="<?= BASEURL ?>/rooms/index">Rooms</a></li>
             <?php if(isset($_SESSION['user_id'])): ?>
                 <li><a href="<?= BASEURL ?>/home/dashboard">Dashboard</a></li>
-                <li><a href="<?= BASEURL ?>/orders/index">My Orders</a></li>
-                <li><a href="<?= BASEURL ?>/orders/create">Cart</a></li>
+                <li><a href="<?= BASEURL ?>/bookings/index">My Bookings</a></li>
                 <li><a href="<?= BASEURL ?>/auth/logout">Logout (<?= $_SESSION['full_name'] ?>)</a></li>
             <?php else: ?>
                 <li><a href="<?= BASEURL ?>/auth/login">Login</a></li>
