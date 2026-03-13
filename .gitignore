@@ -20,6 +20,9 @@ Thumbs.db
 /public/uploads/*
 !/public/uploads/.gitkeep
 
+# Environment file (berisi sensitive data)
+.env
+
 # Config (jika ada sensitive data)
 # app/config/config.php
 
